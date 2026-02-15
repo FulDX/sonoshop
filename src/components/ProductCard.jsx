@@ -6,8 +6,7 @@ export default function ProductCard({
 	onAddToCart,
 }) {
 	return (
-		<div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden group">
-
+		<div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden group flex flex-col">
 			{/* Image */}
 			<div className="relative aspect-square overflow-hidden">
 				<img
@@ -18,8 +17,8 @@ export default function ProductCard({
 			</div>
 
 			{/* Content */}
-			<div className="p-4">
-				<h2 className="font-semibold text-base text-zinc-800 line-clamp-2">
+			<div className="p-4 flex flex-col flex-1">
+				<h2 className="font-semibold text-base text-zinc-800 line-clamp-2 min-h-[48px]">
 					{title}
 				</h2>
 
@@ -27,20 +26,17 @@ export default function ProductCard({
 					{category}
 				</p>
 
-				<div className="flex justify-between items-center mt-4">
-					<p className="font-bold text-lg text-zinc-900">
-						${price}
-					</p>
+				<div className="flex justify-between items-center mt-auto pt-4">
+					<p className="font-bold text-lg text-zinc-900">${price}</p>
 
 					<button
 						onClick={onAddToCart}
-						className="bg-black text-white p-2 rounded-full hover:scale-110 transition"
+						className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center hover:scale-110 transition"
 					>
-						<i className="fa-solid fa-cart-plus text-sm"></i>
+						<i className="fa-solid fa-cart-plus text-sm leading-none"></i>
 					</button>
 				</div>
 			</div>
-
 		</div>
 	);
 }
