@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import ListCategories from "./components/ListCategories";
 import ProductCard from "./components/ProductCard";
 import SearchBar from "./components/SearchBar";
+import SidebarFilter from "./components/SidebarFilter";
 import SortDropdown from "./components/SortDropdown";
 
 export default function App() {
@@ -27,8 +28,11 @@ export default function App() {
 		"Relevance",
 		"Price: Low to High",
 		"Price: High to Low",
-		"Newest",
+		"A-Z",
+		"Z-A"
 	];
+
+	const [search, setSearch] = useState("");
 
 	useEffect(() => {
 		async function fetchData() {
@@ -41,6 +45,14 @@ export default function App() {
 
 		fetchData();
 	}, []);
+
+	const filteredData = products.filter((product) =>
+		product.title.toLowerCase().includes(search.toLowerCase()),
+	);
+
+	const handleSearchChange = (e) => {
+		setSearch(e.target.value);
+	};
 
 	return (
 		<div className="min-h-screen pb-20 lg:pb-0">
@@ -60,7 +72,7 @@ export default function App() {
 
 				{/* Search */}
 				<div className="w-1/2">
-					<SearchBar />
+					<SearchBar value={search} onChange={handleSearchChange} />
 				</div>
 
 				{/* Icons */}
@@ -76,7 +88,7 @@ export default function App() {
 			<main className="p-5 lg:p-10 bg-gray-50 min-h-screen">
 				{/* Mobile Search */}
 				<div className="lg:hidden mb-6 sticky top-0 bg-gray-50 z-40 py-3">
-					<SearchBar />
+					<SearchBar value={search} onChange={handleSearchChange} />
 				</div>
 
 				{/* ===== Desktop Layout ===== */}
@@ -107,32 +119,7 @@ export default function App() {
 
 					<div className="lg:grid lg:grid-cols-12 lg:gap-10">
 						{/* ===== SideBar Filter (Desktop) ===== */}
-						<aside className="hidden lg:block col-span-3">
-							<div className="sticky top-30 space-y-6">
-								<h3 className="text-xl font-semibold">
-									Filters
-								</h3>
-
-								<div className="border-b pb-4">
-									<p className="flex justify-between">
-										Artist <span>+</span>
-									</p>
-								</div>
-
-								<div className="border-b pb-4">
-									<p className="flex justify-between">
-										Genre <span>+</span>
-									</p>
-								</div>
-
-								<div>
-									<label className="flex items-center gap-2 mt-3">
-										<input type="checkbox" />
-										Pre-Order Only
-									</label>
-								</div>
-							</div>
-						</aside>
+						<SidebarFilter />
 
 						{/* ===== Product Section ===== */}
 						<section className="col-span-12 lg:col-span-9">
@@ -170,7 +157,7 @@ export default function App() {
 
 							{/* Product Grid */}
 							<div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-								{products.map((product) => (
+								{filteredData.map((product) => (
 									<ProductCard
 										key={product.id}
 										image={product.thumbnail}
