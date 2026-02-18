@@ -1,26 +1,20 @@
-export default function SidebarFilter() {
+import { useState } from "react";
+import PriceSlider from "./FilterComponents/PriceSlider";
+
+export default function SidebarFilter({priceRange, setPriceRange, maxPrice}) {
+	
+	const step = 50;
+
 	return (
 		<aside className="hidden lg:block col-span-3">
-			<div className="sticky top-30 space-y-6">
+			<div className="sticky top-28 space-y-8">
 				<h3 className="text-xl font-semibold">Filters</h3>
 
-				<div className="border-b pb-4">
-					<p className="flex justify-between">
-						Artist <span>+</span>
-					</p>
-				</div>
+				{/* Price Section */}
+				<div className="border border-gray-200 rounded-2xl p-6 bg-white shadow-sm">
+					<p className="font-semibold text-zinc-800 mb-6">Price</p>
 
-				<div className="border-b pb-4">
-					<p className="flex justify-between">
-						Genre <span>+</span>
-					</p>
-				</div>
-
-				<div>
-					<label className="flex items-center gap-2 mt-3">
-						<input type="checkbox" />
-						Pre-Order Only
-					</label>
+					<PriceSlider step={step} priceRange={priceRange} maxPrice={maxPrice} setPriceRange={(e) => setPriceRange(Number(e.target.value))}/>
 				</div>
 			</div>
 		</aside>

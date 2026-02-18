@@ -29,11 +29,19 @@ export default function App() {
 		"Price: Low to High",
 		"Price: High to Low",
 		"A-Z",
-		"Z-A"
+		"Z-A",
 	];
 
 	const [search, setSearch] = useState("");
 
+	const maxPrice = 500;
+	const [priceRange, setPriceRange] = useState(maxPrice);
+
+	const handleSearchChange = (e) => {
+		setSearch(e.target.value);
+	};
+
+	// Fetch Data
 	useEffect(() => {
 		async function fetchData() {
 			const response = await fetch("https://dummyjson.com/products");
@@ -46,13 +54,22 @@ export default function App() {
 		fetchData();
 	}, []);
 
-	const filteredData = products.filter((product) =>
-		product.title.toLowerCase().includes(search.toLowerCase()),
-	);
+	// Filtering Memo
+	const filteredData = useMemo(() => {
+		let result = products;
 
-	const handleSearchChange = (e) => {
-		setSearch(e.target.value);
-	};
+		if (search) {
+			result = result.filter((product) =>
+				product.title.toLowerCase().includes(search.toLowerCase()),
+			);
+		}
+
+		if (priceRange) {
+			result = result.filter((product) => product.price <= priceRange);
+		}
+
+		return result;
+	}, [products, search, priceRange]);
 
 	return (
 		<div className="min-h-screen pb-20 lg:pb-0">
@@ -119,7 +136,11 @@ export default function App() {
 
 					<div className="lg:grid lg:grid-cols-12 lg:gap-10">
 						{/* ===== SideBar Filter (Desktop) ===== */}
-						<SidebarFilter />
+						<SidebarFilter
+							priceRange={priceRange}
+							setPriceRange={setPriceRange}
+							maxPrice={maxPrice}
+						/>
 
 						{/* ===== Product Section ===== */}
 						<section className="col-span-12 lg:col-span-9">
