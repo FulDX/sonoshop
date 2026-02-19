@@ -51,6 +51,7 @@ export default function SortDropdown({
 						onClick={() => {
 							setSelectedSort(option);
 							setIsOpen(false);
+							console.log(option);
 						}}
 						className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 transition ${
 							selectedSort === option

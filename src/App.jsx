@@ -34,12 +34,14 @@ export default function App() {
 
 	const [search, setSearch] = useState("");
 
-	const maxPrice = 500;
-	const [priceRange, setPriceRange] = useState(maxPrice);
-
 	const handleSearchChange = (e) => {
 		setSearch(e.target.value);
 	};
+
+	const maxPrice = 500;
+	const [priceRange, setPriceRange] = useState(0);
+
+	
 
 	// Fetch Data
 	useEffect(() => {
@@ -56,11 +58,13 @@ export default function App() {
 
 	// Filtering Memo
 	const filteredData = useMemo(() => {
-		let result = products;
+		let result = [...products];
 
 		if (search) {
-			result = result.filter((product) =>
-				product.title.toLowerCase().includes(search.toLowerCase()),
+			result = result.filter(
+				(product) =>
+					product.title.toLowerCase().includes(search.toLowerCase()) ||
+					product.category.toLowerCase().includes(search.toLowerCase()),
 			);
 		}
 
@@ -68,8 +72,25 @@ export default function App() {
 			result = result.filter((product) => product.price <= priceRange);
 		}
 
+		switch (selectedSort) {
+			case "Price: Low to High":
+				result = result.sort((a, b) => a.price - b.price);
+				break;
+			case "Price: High to Low":
+				result = result.sort((a, b) => b.price - a.price);
+				break;
+			case "A-Z":
+				result = result.sort((a, b) => a.title.localeCompare(b.title));
+				break;
+			case "Z-A":
+				result = result.sort((a, b) => b.title.localeCompare(a.title));
+				break;
+			default:
+				result = result.sort((a, b) => a.id - b.id);
+		}
+
 		return result;
-	}, [products, search, priceRange]);
+	}, [products, search, priceRange, selectedSort]);
 
 	return (
 		<div className="min-h-screen pb-20 lg:pb-0">
@@ -128,7 +149,7 @@ export default function App() {
 								/>
 
 								<span className="text-gray-500">
-									{products.length} products
+									{filteredData.length} products
 								</span>
 							</div>
 						</div>
