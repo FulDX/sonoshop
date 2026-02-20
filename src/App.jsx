@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import ListCategories from "./components/ListCategories";
+import MobileFilterSheet from "./components/MobileFilterSheet";
 import ProductCard from "./components/ProductCard";
 import SearchBar from "./components/SearchBar";
 import SidebarFilter from "./components/SidebarFilter";
@@ -9,8 +10,6 @@ export default function App() {
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const [products, setProducts] = useState([]);
 	const categories = useMemo(() => {
-		if (!products.length) return ["All"];
-
 		const uniqueCategories = [
 			...new Set(products.map((product) => product.category)),
 		];
@@ -19,7 +18,7 @@ export default function App() {
 			(cat) => cat.charAt(0).toUpperCase() + cat.slice(1),
 		);
 
-		return ["All", ...formatted];
+		return [...formatted];
 	}, [products]);
 
 	const [selectedSort, setSelectedSort] = useState("Relevance");
@@ -33,6 +32,7 @@ export default function App() {
 	];
 
 	const [search, setSearch] = useState("");
+	const [selectedCategories, setSelectedCategories] = useState([]);
 
 	const handleSearchChange = (e) => {
 		setSearch(e.target.value);
@@ -40,8 +40,6 @@ export default function App() {
 
 	const maxPrice = 500;
 	const [priceRange, setPriceRange] = useState(0);
-
-	
 
 	// Fetch Data
 	useEffect(() => {
@@ -56,15 +54,42 @@ export default function App() {
 		fetchData();
 	}, []);
 
+	// Handle category selection
+	const handleCategoryToggle = (category) => {
+		setSelectedCategories((prev) => {
+			if (prev.includes(category)) {
+				return prev.filter((cat) => cat !== category);
+			} else {
+				return [...prev, category];
+			}
+		});
+	};
+
 	// Filtering Memo
 	const filteredData = useMemo(() => {
 		let result = [...products];
 
+		// Filter by category
+		const activeCategories =
+			selectedCategories.length > 0 ? selectedCategories : ["all"];
+		if (!activeCategories.includes("all")) {
+			result = result.filter((product) =>
+				activeCategories.some(
+					(cat) =>
+						product.category.toLowerCase() === cat.toLowerCase(),
+				),
+			);
+		}
+
 		if (search) {
 			result = result.filter(
 				(product) =>
-					product.title.toLowerCase().includes(search.toLowerCase()) ||
-					product.category.toLowerCase().includes(search.toLowerCase()),
+					product.title
+						.toLowerCase()
+						.includes(search.toLowerCase()) ||
+					product.category
+						.toLowerCase()
+						.includes(search.toLowerCase()),
 			);
 		}
 
@@ -90,7 +115,7 @@ export default function App() {
 		}
 
 		return result;
-	}, [products, search, priceRange, selectedSort]);
+	}, [products, search, priceRange, selectedSort, selectedCategories]);
 
 	return (
 		<div className="min-h-screen pb-20 lg:pb-0">
@@ -138,7 +163,11 @@ export default function App() {
 						</h2>
 
 						<div className="flex justify-between items-center">
-							<ListCategories list={categories} />
+							<ListCategories
+								list={categories}
+								selectedCategories={selectedCategories}
+								onCategoryToggle={handleCategoryToggle}
+							/>
 
 							<div className="flex items-center gap-6">
 								{/* SORT DROPDOWN */}
@@ -167,11 +196,21 @@ export default function App() {
 						<section className="col-span-12 lg:col-span-9">
 							{/* Mobile Category & Filter */}
 							<div className="lg:hidden mb-6">
-								<h2 className="text-2xl font-semibold mb-4">
+								<h2
+									className="
+									list={categories}
+									selectedCategories={selectedCategories}
+									onCategoryToggle={handleCategoryToggle}
+								old mb-4"
+								>
 									Categories
 								</h2>
 
-								<ListCategories list={categories} />
+								<ListCategories
+									list={categories}
+									selectedCategories={selectedCategories}
+									onCategoryToggle={handleCategoryToggle}
+								/>
 
 								<div className="flex justify-between items-center mt-6">
 									<span className="font-medium">
@@ -213,42 +252,14 @@ export default function App() {
 					</div>
 				</div>
 
-				{/* ===== Mobile Filter Bottom Sheet ===== */}
-				<div
-					className={`fixed inset-0 bg-black/40 z-40 transition ${
-						isFilterOpen
-							? "opacity-100 visible"
-							: "opacity-0 invisible"
-					}`}
-					onClick={() => setIsFilterOpen(false)}
-				></div>
-
-				<div
-					className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 z-50 transition-transform duration-300 ${
-						isFilterOpen ? "translate-y-0" : "translate-y-full"
-					}`}
-				>
-					<div className="flex justify-between items-center mb-6">
-						<h3 className="text-lg font-semibold">Filters</h3>
-						<button onClick={() => setIsFilterOpen(false)}>
-							✕
-						</button>
-					</div>
-
-					<div className="space-y-4">
-						<p className="flex justify-between">
-							Artist <span>+</span>
-						</p>
-						<p className="flex justify-between">
-							Genre <span>+</span>
-						</p>
-
-						<label className="flex items-center gap-2 mt-4">
-							<input type="checkbox" />
-							Pre-Order Only
-						</label>
-					</div>
-				</div>
+				{/* ===== Mobile Filter Sheet ===== */}
+				<MobileFilterSheet
+					isFilterOpen={isFilterOpen}
+					setIsFilterOpen={setIsFilterOpen}
+					priceRange={priceRange}
+					setPriceRange={setPriceRange}
+					maxPrice={maxPrice}
+				/>
 			</main>
 		</div>
 	);
