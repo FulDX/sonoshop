@@ -1,5 +1,138 @@
 @import "tailwindcss";
 
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+/* Global scrollbar - subtle untuk page scrollbar */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #d1d5db;
+	border-radius: 999px;
+	transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #9ca3af;
+}
+
+/* Modal scrollbar - styled untuk product details modal */
+.product-details-modal::-webkit-scrollbar {
+	width: 10px;
+}
+
+.product-details-modal::-webkit-scrollbar-track {
+	background: #f8f9fa;
+	border-radius: 999px;
+}
+
+.product-details-modal::-webkit-scrollbar-thumb {
+	background: #d1d5db;
+	border-radius: 999px;
+	border: 2px solid #f8f9fa;
+	transition: background 0.3s ease;
+}
+
+.product-details-modal::-webkit-scrollbar-thumb:hover {
+	background: #9ca3af;
+}
+
+.product-details-modal::-webkit-scrollbar-thumb:active {
+	background: #6b7280;
+}
+
+/* Firefox - Modal scrollbar */
+.product-details-modal {
+	scrollbar-color: #d1d5db #f8f9fa;
+	scrollbar-width: thin;
+}
+
+/* Sidebar filters - scrollable but hidden scrollbar */
+.sidebar-filters::-webkit-scrollbar {
+	display: none;
+}
+
+.sidebar-filters {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+
+/* Firefox - Global scrollbar */
+* {
+	scrollbar-color: #d1d5db transparent;
+	scrollbar-width: thin;
+}
+
+/* ============================================
+   PRODUCT DETAILS ANIMATIONS
+   ============================================ */
+
+/* Fade in backdrop */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.animate-fade-in {
+	animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Slide up modal (mobile) */
+@keyframes slideUp {
+	from {
+		transform: translateY(100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.animate-slide-up {
+	animation: slideUp 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Scale in modal (desktop) */
+@keyframes scaleIn {
+	from {
+		transform: scale(0.95);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+.animate-scale-in {
+	animation: scaleIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 /* RESET */
 input[type="range"] {
 	-webkit-appearance: none;

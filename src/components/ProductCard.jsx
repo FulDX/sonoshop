@@ -4,9 +4,13 @@ export default function ProductCard({
 	category,
 	price,
 	onAddToCart,
+	onSelectProduct,
 }) {
 	return (
-		<div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden group flex flex-col">
+		<div
+			onClick={onSelectProduct}
+			className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden group flex flex-col cursor-pointer"
+		>
 			{/* Image */}
 			<div className="relative aspect-square overflow-hidden">
 				<img
@@ -18,7 +22,7 @@ export default function ProductCard({
 
 			{/* Content */}
 			<div className="p-4 flex flex-col flex-1">
-				<h2 className="font-semibold text-base text-zinc-800 line-clamp-2 min-h-[48px]">
+				<h2 className="font-semibold text-base text-zinc-800 line-clamp-2 min-h-12">
 					{title}
 				</h2>
 
@@ -30,7 +34,10 @@ export default function ProductCard({
 					<p className="font-bold text-lg text-zinc-900">${price}</p>
 
 					<button
-						onClick={onAddToCart}
+						onClick={(e) => {
+							e.stopPropagation();
+							onAddToCart?.();
+						}}
 						className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center hover:scale-110 transition"
 					>
 						<i className="fa-solid fa-cart-plus text-sm leading-none"></i>

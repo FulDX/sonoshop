@@ -1,4 +1,7 @@
-import PriceSlider from "./FilterComponents/PriceSlider";
+import { useState } from "react";
+import PriceFilterSection from "./FilterComponents/PriceFilterSection";
+import RatingFilterSection from "./FilterComponents/RatingFilterSection";
+import StockFilterSection from "./FilterComponents/StockFilterSection";
 
 export default function MobileFilterSheet({
 	isFilterOpen,
@@ -6,7 +9,23 @@ export default function MobileFilterSheet({
 	priceRange,
 	setPriceRange,
 	maxPrice,
+	selectedRatings,
+	onRatingToggle,
 }) {
+	const step = 50;
+	const [expandedSections, setExpandedSections] = useState({
+		price: true,
+		rating: false,
+		stock: false,
+	});
+
+	const toggleSection = (section) => {
+		setExpandedSections((prev) => ({
+			...prev,
+			[section]: !prev[section],
+		}));
+	};
+
 	return (
 		<>
 			{/* ===== Mobile Filter Bottom Sheet ===== */}
@@ -19,9 +38,7 @@ export default function MobileFilterSheet({
 
 			<div
 				className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-1000 transition-transform duration-300 max-h-[80vh] overflow-y-auto 
-                ${
-					isFilterOpen ? "translate-y-0" : "translate-y-full"
-				}`}
+                ${isFilterOpen ? "translate-y-0" : "translate-y-full"}`}
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* Header */}
@@ -38,29 +55,27 @@ export default function MobileFilterSheet({
 				</div>
 
 				{/* Content */}
-				<div className="p-6 space-y-6">
-					{/* Price Section */}
-					<div className="border border-gray-200 rounded-2xl p-6 bg-gray-50">
-						<p className="font-semibold text-zinc-800 mb-6">
-							Price Range
-						</p>
+				<div className="p-6 space-y-4">
+					<PriceFilterSection
+						isExpanded={expandedSections.price}
+						onToggle={() => toggleSection("price")}
+						priceRange={priceRange}
+						setPriceRange={setPriceRange}
+						maxPrice={maxPrice}
+						step={step}
+					/>
 
-						<PriceSlider
-							step={50}
-							priceRange={priceRange}
-							maxPrice={maxPrice}
-							setPriceRange={(e) =>
-								setPriceRange(Number(e.target.value))
-							}
-						/>
+					<RatingFilterSection
+						isExpanded={expandedSections.rating}
+						onToggle={() => toggleSection("rating")}
+						selectedRatings={selectedRatings}
+						onRatingToggle={onRatingToggle}
+					/>
 
-						<div className="mt-4 text-sm text-gray-600">
-							<p>
-								<span className="font-medium">Selected:</span> $
-								{priceRange === 0 ? maxPrice : priceRange}
-							</p>
-						</div>
-					</div>
+					<StockFilterSection
+						isExpanded={expandedSections.stock}
+						onToggle={() => toggleSection("stock")}
+					/>
 				</div>
 
 				{/* Footer CTA */}
@@ -68,6 +83,15 @@ export default function MobileFilterSheet({
 					<button
 						onClick={() => {
 							setPriceRange(0);
+							// Reset all selected ratings
+							selectedRatings.forEach((rating) => {
+								onRatingToggle?.(rating);
+							});
+							setExpandedSections({
+								price: true,
+								rating: false,
+								stock: false,
+							});
 						}}
 						className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-medium text-zinc-800 hover:bg-gray-50 transition"
 					>

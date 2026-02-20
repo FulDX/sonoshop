@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import ListCategories from "./components/ListCategories";
 import MobileFilterSheet from "./components/MobileFilterSheet";
 import ProductCard from "./components/ProductCard";
+import ProductDetails from "./components/ProductDetails";
 import SearchBar from "./components/SearchBar";
 import SidebarFilter from "./components/SidebarFilter";
 import SortDropdown from "./components/SortDropdown";
@@ -9,6 +10,7 @@ import SortDropdown from "./components/SortDropdown";
 export default function App() {
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const [products, setProducts] = useState([]);
+	const [selectedProduct, setSelectedProduct] = useState(null);
 	const categories = useMemo(() => {
 		const uniqueCategories = [
 			...new Set(products.map((product) => product.category)),
@@ -40,6 +42,7 @@ export default function App() {
 
 	const maxPrice = 500;
 	const [priceRange, setPriceRange] = useState(0);
+	const [selectedRatings, setSelectedRatings] = useState([]);
 
 	// Fetch Data
 	useEffect(() => {
@@ -61,6 +64,17 @@ export default function App() {
 				return prev.filter((cat) => cat !== category);
 			} else {
 				return [...prev, category];
+			}
+		});
+	};
+
+	// Handle rating selection
+	const handleRatingToggle = (rating) => {
+		setSelectedRatings((prev) => {
+			if (prev.includes(rating)) {
+				return prev.filter((r) => r !== rating);
+			} else {
+				return [...prev, rating];
 			}
 		});
 	};
@@ -97,6 +111,16 @@ export default function App() {
 			result = result.filter((product) => product.price <= priceRange);
 		}
 
+		// Filter by rating
+		if (selectedRatings.length > 0) {
+			result = result.filter((product) => {
+				const productRating = Math.ceil(product.rating || 0);
+				return selectedRatings.some(
+					(rating) => productRating >= rating,
+				);
+			});
+		}
+
 		switch (selectedSort) {
 			case "Price: Low to High":
 				result = result.sort((a, b) => a.price - b.price);
@@ -115,12 +139,19 @@ export default function App() {
 		}
 
 		return result;
-	}, [products, search, priceRange, selectedSort, selectedCategories]);
+	}, [
+		products,
+		search,
+		priceRange,
+		selectedSort,
+		selectedCategories,
+		selectedRatings,
+	]);
 
 	return (
 		<div className="min-h-screen pb-20 lg:pb-0">
 			{/* ================= Mobile Foo ================= */}
-			<div className="fixed bottom-0 left-0 right-0 flex justify-around items-center p-5 bg-white shadow-lg lg:hidden text-xl z-1000">
+			<div className="fixed bottom-0 left-0 right-0 flex justify-around items-center p-5 bg-white shadow-lg lg:hidden text-xl z-30">
 				<i className="fa-regular fa-house"></i>
 				<i className="fa-regular fa-list"></i>
 				<i className="fa-regular fa-cart-arrow-down"></i>
@@ -190,19 +221,15 @@ export default function App() {
 							priceRange={priceRange}
 							setPriceRange={setPriceRange}
 							maxPrice={maxPrice}
+							selectedRatings={selectedRatings}
+							onRatingToggle={handleRatingToggle}
 						/>
 
 						{/* ===== Product Section ===== */}
 						<section className="col-span-12 lg:col-span-9">
 							{/* Mobile Category & Filter */}
 							<div className="lg:hidden mb-6">
-								<h2
-									className="
-									list={categories}
-									selectedCategories={selectedCategories}
-									onCategoryToggle={handleCategoryToggle}
-								old mb-4"
-								>
+								<h2 className="text-lg font-semibold text-zinc-800 mb-4">
 									Categories
 								</h2>
 
@@ -231,7 +258,7 @@ export default function App() {
 										options={sortOptions}
 									/>
 									<span className="text-sm text-gray-500">
-										{products.length} products
+										{filteredData.length} products
 									</span>
 								</div>
 							</div>
@@ -245,6 +272,10 @@ export default function App() {
 										title={product.title}
 										category={product.category}
 										price={product.price}
+										product={product}
+										onSelectProduct={() =>
+											setSelectedProduct(product)
+										}
 									/>
 								))}
 							</div>
@@ -259,8 +290,17 @@ export default function App() {
 					priceRange={priceRange}
 					setPriceRange={setPriceRange}
 					maxPrice={maxPrice}
+					selectedRatings={selectedRatings}
+					onRatingToggle={handleRatingToggle}
 				/>
 			</main>
+
+			{selectedProduct && (
+				<ProductDetails
+					product={selectedProduct}
+					onClose={() => setSelectedProduct(null)}
+				/>
+			)}
 		</div>
 	);
 }
